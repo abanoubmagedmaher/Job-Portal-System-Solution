@@ -11,6 +11,20 @@ namespace Job_Portal_System
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            #region Handel CORSE 
+            builder.Services.AddCors(optios =>
+            {
+                optios.AddPolicy("JopPortal", polict =>
+                {
+                    polict.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+
+                });
+
+            }
+            );
+            #endregion
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -23,6 +37,9 @@ namespace Job_Portal_System
                 app.UseSwaggerUI();
             }
 
+            app.UseStaticFiles();
+
+            app.UseCors("JopPortal");
             app.UseAuthorization();
 
 
