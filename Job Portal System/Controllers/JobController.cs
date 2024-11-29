@@ -22,7 +22,7 @@ namespace Job_Portal_System.Controllers
             var jobs = await _unitOfWork.JobRepository.GetAllAsync();
             if (jobs == null)
             {
-                return NotFound("No Jobs Found");
+                return NotFound(new { Message = "Jobs not Found" });
             }
             return Ok(jobs);
         }
@@ -33,7 +33,7 @@ namespace Job_Portal_System.Controllers
             var job = await _unitOfWork.JobRepository.GetByIdAsync(id);
             if (job == null)
             {
-                return NotFound("Job not Found");
+                return NotFound(new { Message = "Job not Found" });
             }
             return Ok(job);
 
