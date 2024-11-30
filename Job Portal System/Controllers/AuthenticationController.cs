@@ -62,29 +62,7 @@ namespace Job_Portal_System.Controllers
         }
 
         // Generate JWT token
-        //private string GenerateJwtToken(ApplicationUser user)
-        //{
-        //    var claims = new[]
-        //    {
-        //        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-        //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        //        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        //    };
-
-        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        //    var token = new JwtSecurityToken(
-        //        _configuration["Jwt:Issuer"],
-        //        _configuration["Jwt:Audience"],
-        //        claims,
-        //        expires: DateTime.Now.AddDays(1),
-        //        signingCredentials: creds
-        //    );
-
-        //    return new JwtSecurityTokenHandler().WriteToken(token);
-        //}
-
-
+       
         private string GenerateJwtToken(ApplicationUser user)
         {
             // Ensure the key length is at least 256 bits (32 bytes).
