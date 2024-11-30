@@ -38,5 +38,16 @@ namespace Job_Portal_System.Controllers
             return Ok(job);
 
         }
+
+        [HttpPost("addJob")]
+        public async Task<IActionResult> AddJob(Job job)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { Message = " Invalid job data" });
+            await _unitOfWork.JobRepository.AddAsync(job);
+            await _unitOfWork.SaveAsync();
+            return Ok(new { Message = "Application Submitted SuccessFully !" });
+
+        }
     }
 }
