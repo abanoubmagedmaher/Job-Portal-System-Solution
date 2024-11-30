@@ -1,8 +1,13 @@
 
 using Job_Portal_System.Data;
 using Job_Portal_System.Interfaces;
+using Job_Portal_System.Models;
 using Job_Portal_System.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Job_Portal_System
 {
@@ -18,6 +23,29 @@ namespace Job_Portal_System
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+            #endregion
+            #region Identity
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                   .AddEntityFrameworkStores<JobPortalContext>()
+                   .AddDefaultTokenProviders();
+            #endregion
+
+            #region JWT
+            // Configure JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
             #endregion
             #region Register UOW
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -54,6 +82,7 @@ namespace Job_Portal_System
             app.UseStaticFiles();
 
             app.UseCors("JopPortal");
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
