@@ -48,7 +48,7 @@ namespace Job_Portal_System.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return Unauthorized(new { Message = "Invalid credentials" });
+                return Unauthorized(new { Message = "Invalid UserName or Password" });
             }
 
             var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
@@ -58,7 +58,7 @@ namespace Job_Portal_System.Controllers
                 return Ok(new { Token = token });
             }
 
-            return Unauthorized(new { Message = "Invalid credentials" });
+            return Unauthorized(new { Message = "Invalid UserName or Password" });
         }
 
         // Generate JWT token
@@ -94,15 +94,4 @@ namespace Job_Portal_System.Controllers
 
     }
 
-    public class RegisterModel
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class LoginModel
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
 }
