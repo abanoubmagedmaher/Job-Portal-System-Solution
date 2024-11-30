@@ -1,4 +1,9 @@
 
+using Job_Portal_System.Data;
+using Job_Portal_System.Interfaces;
+using Job_Portal_System.Services;
+using Microsoft.EntityFrameworkCore;
+
 namespace Job_Portal_System
 {
     public class Program
@@ -8,6 +13,15 @@ namespace Job_Portal_System
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            #region Register DbContext
+            builder.Services.AddDbContext<JobPortalContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+            #endregion
+            #region Register UOW
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            #endregion
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
