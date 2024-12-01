@@ -66,9 +66,12 @@ namespace Job_Portal_System
 
             }
             );
+
             #endregion
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddAuthorization();
+
 
             var app = builder.Build();
 
