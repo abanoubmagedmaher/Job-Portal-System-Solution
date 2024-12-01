@@ -123,7 +123,26 @@ namespace Job_Portal_System.Controllers
             }
         }
 
+        [HttpGet("getApplicationById/{id}")]
+        public async Task<IActionResult> getApplicationById(int id)
+        {
+            try
+            {
+                var application = await _unitOfWork.ApplicationRepository.GetByIdWithConditionAsync(id, "Job");
+                if(application == null)
+                {
+                    return NotFound(new { Message = "No application found." });
 
+                }
+                return Ok(application);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "An error occurred while fetching application.", Details = ex.Message });
+
+
+            }
+        }
 
 
 
