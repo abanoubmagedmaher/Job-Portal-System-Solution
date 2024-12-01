@@ -18,10 +18,28 @@ namespace Job_Portal_System.Services
             return await _dbSet.ToListAsync();
         }
 
+        
+        public async Task<IEnumerable<T>> GetAllWithConditionAsync(string include)
+        {
+            return await _dbSet.Include(include).ToListAsync();
+        }
+
         public async Task<T> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
+
+        public async Task<T> GetByIdWithConditionAsync(int id, string include = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (!string.IsNullOrEmpty(include))
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(entity => EF.Property<int>(entity, "Id") == id);
+        }
+
         public async Task AddAsync(T entity)
         {
              await _dbSet.AddAsync(entity);

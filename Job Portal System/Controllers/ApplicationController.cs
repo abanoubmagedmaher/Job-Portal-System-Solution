@@ -1,8 +1,11 @@
 ﻿using Job_Portal_System.DTOS;
 using Job_Portal_System.Interfaces;
 using Job_Portal_System.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Job_Portal_System.Controllers
 {
@@ -24,12 +27,12 @@ namespace Job_Portal_System.Controllers
             var job = await _unitOfWork.JobRepository.GetByIdAsync(applicationDto.JobId);
             if (job == null)
             {
-                return NotFound( new { Message="Job not Found" });
+                return NotFound(new { Message = "Job not Found" });
             }
 
             // save File
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-            if(!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
             //path
             string filePath = Path.Combine(uploadsFolder, Guid.NewGuid() + Path.GetExtension(applicationDto.Resume.FileName));
@@ -41,17 +44,89 @@ namespace Job_Portal_System.Controllers
             // Map DTo To Application Entity
             var application = new Application
             {
-                Name =applicationDto.Name,
+                Name = applicationDto.Name,
                 Email = applicationDto.Email,
-                ResumePath =filePath,
+                ResumePath = filePath,
                 JobId = applicationDto.JobId
             };
 
             await _unitOfWork.ApplicationRepository.AddAsync(application);
             await _unitOfWork.SaveAsync();
-            return Ok(new { Message="Application Submitted SuccessFully !" });
+            return Ok(new { Message = "Application Submitted SuccessFully !" });
 
 
         }
+
+
+
+        #region Works Code With Auth
+        [HttpPost("SubmitApplication")]
+        [Authorize]
+        public async Task<IActionResult> SubmitApplicationAuth([FromForm] ApplicationDto applicationDto)
+        {
+            // Validate Job Id
+            var job = await _unitOfWork.JobRepository.GetByIdAsync(applicationDto.JobId);
+            if (job == null)
+            {
+                return NotFound(new { Message = "Job not Found" });
+            }
+
+            // Get the UserId from the token
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized(new { Message = "User not authenticated" });
+            }
+
+            // Save File
+            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+            // Generate file path
+            string filePath = Path.Combine(uploadsFolder, Guid.NewGuid() + Path.GetExtension(applicationDto.Resume.FileName));
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await applicationDto.Resume.CopyToAsync(stream);
+            }
+
+            var application = new Application
+            {
+                Name = applicationDto.Name,
+                Email = applicationDto.Email,
+                ResumePath = filePath,
+                JobId = applicationDto.JobId,
+                UserId = userId
+            };
+
+            await _unitOfWork.ApplicationRepository.AddAsync(application);
+            await _unitOfWork.SaveAsync();
+            return Ok(new { Message = "Application Submitted Successfully!" });
+        }
+
+        #endregion
+
+        [HttpGet("getAll")]
+        public async Task<IActionResult> GetAllApplications()
+        {
+            try
+            {
+                var applications = await _unitOfWork.ApplicationRepository.GetAllWithConditionAsync("Job");
+                if (applications == null || !applications.Any())
+                {
+                    return NotFound(new { Message = "No applications found." });
+                }
+                return Ok(applications);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "An error occurred while fetching applications.", Details = ex.Message });
+            }
+        }
+
+
+
+
+
+
     }
 }

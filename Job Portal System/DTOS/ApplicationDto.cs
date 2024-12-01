@@ -16,6 +16,8 @@ namespace Job_Portal_System.DTOS
         public int JobId { get; set; }
 
         [Required]
-        public IFormFile Resume { get; set; } // For file uploads
+        public IFormFile Resume { get; set; }
+
+
     }
 }
