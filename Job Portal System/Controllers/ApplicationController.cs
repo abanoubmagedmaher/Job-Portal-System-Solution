@@ -60,7 +60,7 @@ namespace Job_Portal_System.Controllers
 
 
         #region Works Code With Auth
-        [HttpPost("SubmitApplication")]
+        [HttpPost("SubmitApplicationAuth")]
         [Authorize]
         public async Task<IActionResult> SubmitApplicationAuth([FromForm] ApplicationDto applicationDto)
         {
@@ -95,7 +95,7 @@ namespace Job_Portal_System.Controllers
                 Email = applicationDto.Email,
                 ResumePath = filePath,
                 JobId = applicationDto.JobId,
-                UserId = userId
+                User = userId
             };
 
             await _unitOfWork.ApplicationRepository.AddAsync(application);
