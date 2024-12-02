@@ -63,8 +63,9 @@ namespace Job_Portal_System
 
 
             #region Configure JWT Authentication
-            builder.Services.AddAuthentication(option => { 
-                            option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            builder.Services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
                 .AddJwtBearer(options =>
                 {
@@ -79,7 +80,7 @@ namespace Job_Portal_System
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                     };
                 });
-            //builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization();
             #endregion
 
             var app = builder.Build();
