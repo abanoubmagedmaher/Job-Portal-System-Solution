@@ -31,7 +31,7 @@ namespace Job_Portal_System
                    .AddDefaultTokenProviders();
             #endregion
 
-         
+
 
             #region Register UOW
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -39,7 +39,7 @@ namespace Job_Portal_System
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-           
+
             #region Handel CORSE 
             builder.Services.AddCors(optios =>
             {
@@ -60,31 +60,26 @@ namespace Job_Portal_System
             builder.Services.AddSwaggerGen();
             builder.Services.AddAuthorization();
 
-            #region Handel Authorization
 
-            // Add services to the container.
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+
+            #region Configure JWT Authentication
+            builder.Services.AddAuthentication(option => { 
+                            option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-                    )
-                };
-            });
-
-            builder.Services.AddAuthorization();
-
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
+            //builder.Services.AddAuthorization();
             #endregion
 
             var app = builder.Build();
